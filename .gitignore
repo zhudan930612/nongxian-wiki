@@ -1,0 +1,13 @@
+# Claude Code / Claudian 本地状态
+.claude/
+.claudian/
+
+# Obsidian 本地 UI 状态
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+
+# 系统文件
+.DS_Store
+Thumbs.db
