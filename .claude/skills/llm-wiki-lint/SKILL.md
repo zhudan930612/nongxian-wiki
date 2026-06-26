@@ -122,6 +122,51 @@ Verify that every source page in `20-知识库/04-来源/` has a corresponding r
 
 Also check that no raw materials exist without corresponding source pages (unless intentionally excluded).
 
+### 9a. Check Source Page Classification Integrity
+
+#### 9a-1. Verify Classification Consistency
+
+Verify that every source page in `20-知识库/04-来源/` is placed in the correct subdirectory, matching its `10-原始资料/` category:
+
+1. Traverse `20-知识库/04-来源/` subdirectories
+2. For each `.md` file, read the `source:` field from YAML frontmatter
+3. Extract the raw-material category from the path (e.g., `10-原始资料/06-媒体报道/xxx.pdf` → `06-媒体报道`)
+4. Compare with the actual subdirectory name in `04-来源/` (e.g., `04-来源/06-媒体报道/xxx.md`)
+5. Flag any mismatch:
+   - `source:` points to `10-原始资料/06-媒体报道/` but file is in `04-来源/04-技术规范/` → **miscategorized**, suggest moving to correct subdir
+   - `source:` is missing or doesn't contain a valid category → **uncategorizable**, flag for manual review
+
+Also check for files in `04-来源/` root (not in any subdirectory) and flag them as **uncategorized**.
+
+#### 9a-2. Suggest Subdirectory Splits for Overgrown Folders
+
+For each subdirectory in `20-知识库/04-来源/`, count the number of `.md` files. Apply these thresholds:
+
+| Count | Status | Action |
+|-------|--------|--------|
+| ≤ 30 | ✅ 健康 | 无需操作 |
+| 31–50 | ⚠️ 偏大 | 建议关注，考虑是否需要拆分 |
+| 51–100 | 🔶 过大 | 建议规划拆分方案 |
+| > 100 | 🔴 拥挤 | 必须拆分 |
+
+When a folder exceeds a threshold, analyze the contents to propose a natural split:
+
+1. **Scan existing implicit categories** — Read the files' topics, sources, and tags to identify natural groupings (e.g., `06-媒体报道/` could split into `实务经验/`, `政策解读/`, `技术方案/`, `学术观点/`).
+2. **Check against `10-原始资料/` structure** — See if the raw materials already imply a finer classification that the source pages don't reflect.
+3. **Propose the split** — Suggest specific subdirectory names, file counts per new subdir, and the migration steps (move files + update index links).
+4. **Honor user decision** — Present the proposal clearly and let the user approve before executing.
+
+> 当前状态参考（`04-来源/`）：
+> - `01-政策法规/` — 2 ✅
+> - `02-学术论文/` — 17 ✅
+> - `03-行业报告/` — 5 ✅
+> - `04-技术规范/` — 11 ✅
+> - `05-产品与公司/` — 4 ✅
+> - **`06-媒体报道/` — 83 🔶**
+> - `07-会议沟通/` — 32 ⚠️
+
+After confirming corrections, rebuild the `04-来源/` index in `index.md` to ensure all wiki links include the subdirectory prefix.
+
 ### 10. Generate Lint Report
 
 Create or update a report page, typically in `20-知识库/06-元/` or append to `20-知识库/00-索引/log.md`.
