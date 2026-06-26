@@ -7,6 +7,9 @@
 # Claudian 插件会话/配置数据
 .claudian/
 
+# Claudian 插件运行时状态
+.obsidian/plugins/realclaudian/data.json
+
 # 系统文件
 .DS_Store
 Thumbs.db
