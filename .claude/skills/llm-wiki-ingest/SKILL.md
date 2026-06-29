@@ -18,32 +18,7 @@ Common trigger phrases:
 - "总结并归档"
 - "ingest"
 
-## Vault Structure Assumptions
-
-This skill assumes the vault follows the LLM Wiki pattern:
-
-```
-vault-root/
-├── CLAUDE.md              # Schema and workflow definition
-├── 00-收件箱/              # Inbox: only entry point for new materials
-├── 10-原始资料/            # Raw materials (read-only after ingest)
-│   ├── 01-文章/            # Web articles / blog posts
-│   ├── 02-论文/            # Academic papers
-│   └── 03-资源/            # Reports / policies / data / images
-└── 20-知识库/              # LLM-maintained knowledge base
-    ├── 00-索引/
-    │   ├── index.md
-    │   ├── log.md
-    │   └── stats.md
-    ├── 01-实体/            # People / organizations
-    ├── 02-概念/            # Concepts / definitions
-    ├── 03-主题/            # Themes / synthesis
-    ├── 04-来源/            # Source summaries
-    ├── 05-问答/            # Archived Q&A
-    └── 06-元/              # Meta: todos, templates
-```
-
-Always read `CLAUDE.md` first if it exists, as it may override this skill.
+Always read `CLAUDE.md` first if it exists, as it may override this skill. See `CLAUDE.md` for schema, naming, path rules, and file operation conventions.
 
 ## Ingest Workflow
 
@@ -167,31 +142,6 @@ Remove processed files from `00-收件箱/`. Keep `README.md` and any files the 
 ### 14. Update Todos
 
 Check `20-知识库/06-元/06-todo.md` and clear or update relevant items.
-
-## Naming Conventions
-
-- Directory names at levels 1–2 use Chinese with `XX-` sorting prefix
-- Raw material files: `YYYYMMDD-原标题.扩展名`
-- Knowledge-base source pages: same base name as raw material, `.md`
-- Entity / concept / theme pages: use the existing vault naming style
-- Page titles (h1): Chinese
-
-## Link Style
-
-- Internal links: `[[页面名]]` or `[[路径/页面]]`
-- Source pages in index: `[[04-来源/YYYY-MM-DD-标题]]`
-- External links: `[text](url)`
-
-## Path Rules
-
-- Use relative paths from the vault root
-- Do not use absolute paths or leading slashes for vault operations
-- `10-原始资料/` is read-only after ingest
-- `20-知识库/` is maintained by the LLM
-
-## Iteration Principle
-
-First-pass pages do not need to be exhaustive. Create concise summaries and refine them as the knowledge base grows.
 
 ## Example
 

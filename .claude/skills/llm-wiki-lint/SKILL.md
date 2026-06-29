@@ -20,29 +20,7 @@ Common trigger phrases:
 - "检查矛盾"
 - "检查过时内容"
 
-## Vault Structure Assumptions
-
-This skill assumes the vault follows the LLM Wiki pattern:
-
-```
-vault-root/
-├── CLAUDE.md              # Schema and workflow definition
-├── 00-收件箱/
-├── 10-原始资料/
-└── 20-知识库/
-    ├── 00-索引/
-    │   ├── index.md
-    │   ├── log.md
-    │   └── stats.md
-    ├── 01-实体/
-    ├── 02-概念/
-    ├── 03-主题/
-    ├── 04-来源/
-    ├── 05-问答/
-    └── 06-元/
-```
-
-Always read `CLAUDE.md` first if it exists, as it may override this skill.
+Always read `CLAUDE.md` first if it exists, as it may override this skill. See `CLAUDE.md` for schema, naming, path rules, and file operation conventions.
 
 ## Lint Workflow
 
@@ -232,10 +210,6 @@ Recommend running this check:
 - After every 5–10 ingests
 - Before major reviews or exports
 - When the user explicitly requests it
-
-## Iteration Principle
-
-A lint run does not need to fix everything. Prioritize high-impact issues (contradictions, outdated core claims, broken links) and leave low-priority refinements for future iterations.
 
 ## Example
 
