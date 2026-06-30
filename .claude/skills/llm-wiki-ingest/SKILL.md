@@ -118,17 +118,44 @@ author: 作者名
 - 原载：...
 ```
 
-### 7. Update Entity Pages
+### 6a. Path Verification (Prevent Root-Level Files)
 
-Create or update pages in `20-知识库/01-实体/` for relevant people, organizations, or locations.
+Before creating ANY new file, verify it is NOT placed in the vault root:
 
-### 8. Update Concept Pages
+- ✅ Valid: `20-知识库/04-来源/01-政策法规/20260630-xxx.md`
+- ❌ Invalid: `01-华宇科技.md` (at root — misplaced)
+- ❌ Invalid: `任何.md` (at root — misplaced)
 
-Create or update pages in `20-知识库/02-概念/` for key concepts, definitions, or methodologies.
+**规则**：知识库文件必须放在 `20-知识库/XX-分类/` 下，禁止在根目录创建 `.md` 文件。
 
-### 9. Update Theme Pages (if needed)
+If a file path resolves to the root level, correct it to the proper subdirectory before writing.
 
-Create or update pages in `20-知识库/03-主题/` for cross-cutting synthesis.
+### 7. Reference Entity Pages (Forward References)
+
+In the source summary page, add wiki links to relevant entities (people, organizations, locations):
+
+- Use `[[01-实体/01-实体名]]` format (with prefix, without `20-知识库/` prefix)
+- **Default**: Do NOT create the entity page during ingest — leave it as a gray link (forward reference)
+- **Exception**: Only create the entity page if it is the **core topic** of this ingest AND you have sufficient information to write a meaningful page
+- If creating: MUST use `20-知识库/01-实体/01-实体名.md` full path, NEVER at root
+
+### 8. Reference Concept Pages (Forward References)
+
+In the source summary page, add wiki links to relevant concepts (definitions, methods, theories):
+
+- Use `[[02-概念/02-概念名]]` format
+- **Default**: Do NOT create the concept page during ingest — leave it as a gray link
+- **Exception**: Only create if the concept is the **core topic** of this ingest AND you have sufficient information
+- If creating: MUST use `20-知识库/02-概念/02-概念名.md` full path, NEVER at root
+
+### 9. Reference Theme Pages (Forward References)
+
+In the source summary page, add wiki links to relevant themes (cross-cutting synthesis topics):
+
+- Use `[[03-主题/03-主题名]]` format
+- **Default**: Do NOT create the theme page during ingest — leave it as a gray link
+- **Exception**: Only create if the theme is the core contribution of this ingest
+- If creating: MUST use `20-知识库/03-主题/03-主题名.md` full path, NEVER at root
 
 ### 10. Update Index
 
@@ -159,8 +186,7 @@ LLM:
 2. Check for duplicates in `10-原始资料/` and `20-知识库/04-来源/`
 3. Verify each PDF has extractable text
 4. Move PDFs to `10-原始资料/01-文章/`, `02-论文/`, or `03-资源/`
-5. Create source summary pages in `20-知识库/04-来源/`
-6. Update entity/concept/theme pages as needed
-7. Update `index.md`, `log.md`, `stats.md`
-8. Remove processed files from `00-收件箱/`
-9. Report summary to user
+5. Create source summary pages in `20-知识库/04-来源/` with wiki links (forward references)
+6. Update `index.md`, `log.md`, `stats.md`
+7. Remove processed files from `00-收件箱/`
+8. Report summary to user

@@ -98,6 +98,26 @@ Verify consistency:
   - 无固有日期 → 文件名应匹配 `created` 日期
   - 不一致则标记为违规，注明期望日期
 
+### 8a. Check Root-Level Files
+
+Scan the vault root for `.md` files that should not be there:
+
+- ✅ Allowed at root: `CLAUDE.md`, `README.md`, `.gitignore`, `.obsidian/`
+- ❌ Anything else (e.g., `01-华宇科技.md`, `概念名.md`) → flag as **misplaced**
+
+For each misplaced file:
+1. Report the filename and its size
+2. Suggest the correct target directory based on the naming prefix:
+   - `01-` prefix → `20-知识库/01-实体/`
+   - `02-` prefix → `20-知识库/02-概念/`
+   - `03-` prefix → `20-知识库/03-主题/`
+   - `04-` prefix → `20-知识库/04-来源/`
+   - No prefix → examine content to determine type
+3. If the file is empty (0 bytes), flag for **deletion or content completion**
+4. In the lint report, list all misplaced files as a separate section
+
+> **Prevention note**: Root-level files are typically created when the ingest workflow writes a file without the full `20-知识库/XX-分类/` prefix. The ingest skill's step 6a (Path Verification) should prevent this, but this lint check catches any that slip through.
+
 ### 9. Check Raw Materials Integrity
 
 Verify that every source page in `20-知识库/04-来源/` has a corresponding raw material in `10-原始资料/` and that the `source` path in frontmatter is correct.
