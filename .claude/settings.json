@@ -18,7 +18,8 @@
       "Bash(del \"01-华宇科技.md\" \"四农普遥感技术.md\")",
       "Bash(git commit -m 'fix\\(skills\\): 统一 ingest/lint 规则，防止生成空文件 *)",
       "Bash(git rm *)",
-      "Bash(git commit -m 'chore: 删除根目录的两个空文件 *)"
+      "Bash(git commit -m 'chore: 删除根目录的两个空文件 *)",
+      "Bash(git commit -v '-mfeat: 新增 claude-md-audit 技能 — CLAUDE.md 结构审查 *)"
     ]
   },
   "hooks": {
@@ -26,9 +27,9 @@
       {
         "hooks": [
           {
+            "type": "command",
             "command": "echo nongbaoyun-vault-start",
-            "timeout": 10,
-            "type": "command"
+            "timeout": 10
           }
         ]
       }
