@@ -97,6 +97,45 @@ aliases: [别名1, 别名2]
 
 可选字段：`source`（来源路径）、`author`（作者）、`status`（draft/active/archived）
 
+### 新增元数据字段（v2 增强）
+
+所有知识库页面可选择性地包含以下扩展字段：
+
+```yaml
+confidence: 0.85                        # 总体置信度 [0.0, 1.0]
+confidence_factors:                      # 评分明细
+  source_count: 8                        # 支持页面的来源数
+  last_confirmed: 2026-06-30             # 最近确认日期
+  contradiction_count: 0                 # 矛盾数
+  cross_references: 5                    # 引用数
+supersedes: []                           # 取代的旧页面列表
+superseded_by: []                        # 被哪些新页面取代
+status: active                           # active / fading / superseded / archived / draft
+crystallized_from: query                 # 结晶来源（问答页专有）
+session_summary: true                    # 是否完整会话摘要（问答页专有）
+```
+
+**字段说明：**
+
+| 字段 | 适用页面 | 说明 |
+|------|---------|------|
+| `confidence` | 实体/概念/主题/问答 | 0.0-1.0，lint 时批量计算 |
+| `confidence_factors` | 同 confidence | 提供评分透明度，lint 时更新 |
+| `supersedes` | 所有 | 被当前页面取代的旧页面路径 |
+| `superseded_by` | 所有 | 取代当前页面的新页面路径 |
+| `status` | 所有 | 扩展可选值：fading（180天未确认）、superseded（被取代） |
+| `crystallized_from` | 问答页 | 结晶来源：query / session / ingest-auto |
+| `session_summary` | 问答页 | 是否为完整会话摘要 |
+
+**状态流转：**
+
+```
+active ──(180天未确认)──→ fading ──(365天未确认)──→ archived
+active ──(被新页面取代)────→ superseded
+```
+
+`fading/superseded/archived` 页面默认不参与查询排序，仅在回溯时可见。
+
 ### 链接规范
 
 - 内部链接使用 Wiki 链接格式：`[[页面名]]` 或 `[[路径/页面]]`
@@ -134,7 +173,20 @@ aliases: [别名1, 别名2]
 1. 先读取 `index.md` 了解知识库全貌
 2. 根据问题搜索相关页面并阅读
 3. 综合回答，附上引用（Wiki 链接形式）
-4. **有价值的问答可以归档** — 如果回答有长期参考价值，写入 `20-知识库/05-问答/` 下
+4. **结晶检查**：回答完成后自动评估是否值得归档
+   - **触发条件**（满足任一即可）：
+     - 回答涉及 3+ 个不同来源的交叉分析
+     - 回答包含知识库现有页面未覆盖的结论
+     - 回答涉及当前项目关键决策
+     - 同一类型问题被多次询问（自动判断频率）
+   - **触发时**：按结晶流程（见步骤 5）创建归档
+5. **结晶流程**（仅在触发时执行）：
+   a. 创建 Q&A 归档页：`20-知识库/05-问答/YYYYMMDD-标题.md`
+      - 写入 frontmatter：包含 `crystallized_from`、`confidence`、`status` 等字段
+      - 正文记录问题和综合回答
+   b. 抽取事实原子：放入结晶页的 `## 待确认事实` 区块
+   c. 增量更新相关页面的 `source_count`、`cross_references`、`last_confirmed`
+   d. 更新索引和日志
 
 ### 3️⃣ 检查 (Lint)
 
@@ -146,6 +198,36 @@ aliases: [别名1, 别名2]
 - 每摄取 5–10 个资料后执行一次
 - 导出或重大回顾前执行一次
 - 用户主动要求时执行
+
+#### Lint 扩展步骤（v2 增强）
+
+##### 4a. 置信度批量评分
+
+对实体、概念、主题、问答页面批量计算置信度：
+
+| 维度 | 计算方式 | 权重 |
+|------|---------|------|
+| 来源数 | `min(source_count / 5, 1.0)` | 30% |
+| 时效性 | `max(0, 1 - days_since_last_confirmed / 180)` | 25% |
+| 矛盾数 | `max(0, 1 - contradiction_count × 0.2)` | 20% |
+| 引用数 | `min(cross_references / 3, 1.0)` | 15% |
+| 完成度 | 内容结构完整度（正文+链接+frontmatter） | 10% |
+
+更新状态流转：`last_confirmed > 180天 → fading`，`> 365天 → archived`。
+
+##### 4b. 取代检测
+
+1. 遍历所有页面，检查 `superseded_by` 字段
+2. 若目标页面存在且 `status: active`，将当前页面设为 `status: superseded`
+3. 检查 `superseded` 页面是否还被活跃页引用 → 报告
+4. 检查取代链是否形成循环 → 报告异常
+
+##### 4c. 结晶后处理
+
+1. 遍历 `05-问答/` 中 `status: active` 且含 `## 待确认事实` 的页面
+2. 将事实原子批量合并到对应的实体/概念/主题页
+3. 合并成功后，将 `## 待确认事实` 改为 `## 已吸收事实`
+4. 设定结晶页 `status: absorbed`（表示事实已完全吸收）
 
 ## 文件操作守则
 

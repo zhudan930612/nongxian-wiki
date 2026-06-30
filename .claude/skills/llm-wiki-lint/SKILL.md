@@ -61,6 +61,23 @@ Identify content that may no longer be accurate:
 - Deprecated terminology
 - Source pages with old dates that may need re-evaluation
 
+### 4b. 批量置信度评分
+
+对 01-实体/、02-概念/、03-主题/、05-问答/ 下的页面进行置信度评分：
+
+1. **读取页面 frontmatter**：获取 `confidence_factors` 中存储的原始数据
+2. **时效性计算**：`days_since_confirmed = today - last_confirmed`，`timeliness = max(0, 1 - days_since_confirmed / 180)`
+3. **完成度检查**：页面是否有正文内容（h1 后至少一段文字）、是否有 Wiki 链接、是否有完整 frontmatter
+4. **加权求和**：
+   ```
+   confidence = source_score × 0.30 + timeliness × 0.25 + contradiction_score × 0.20 + reference_score × 0.15 + completeness × 0.10
+   ```
+5. **状态自动流转**：
+   - `days_since_confirmed > 180` → `status: fading`（之前是 active）
+   - `days_since_confirmed > 365` → `status: archived`（之前是 fading）
+   - 被 `superseded_by` 引用的 → `status: superseded`
+6. **写入更新**：将新的 `confidence` 和 `status` 写回页面 frontmatter
+
 ### 5. Check for Orphan Pages
 
 Find pages with no inbound wiki links:
@@ -77,6 +94,19 @@ Scan pages for wiki links that point to non-existent pages:
 - Extract all `[[...]]` links
 - Check if the target file exists
 - If a concept is referenced frequently but has no page, suggest creating it in `02-概念/`
+
+### 6a. 取代检测
+
+扫描所有页面的 `supersedes` 和 `superseded_by` 字段：
+
+1. **正向验证**：对每页的 `superseded_by` 列表，检查目标页面是否存在
+   - 若存在且 `status: active`，当前页设 `status: superseded`
+   - 若不存在，记录到 lint 报告（断链警告）
+2. **反向验证**：对每页的 `supersedes` 列表，类似处理
+3. **循环检测**：检查是否存在 A→B→C→A 的取代循环
+4. **活跃引用检测**：检查 `status: superseded` 的页面是否还被其他活跃页面引用
+   - 若有，在 lint 报告中列出过时引用，建议修复
+5. **更新取代日志**：将新发现的取代关系追加到 supersession-log.md
 
 ### 7. Check Cross-Reference Completeness
 
@@ -117,6 +147,28 @@ For each misplaced file:
 4. In the lint report, list all misplaced files as a separate section
 
 > **Prevention note**: Root-level files are typically created when the ingest workflow writes a file without the full `20-知识库/XX-分类/` prefix. The ingest skill's step 6a (Path Verification) should prevent this, but this lint check catches any that slip through.
+
+### 8b. 结晶后处理
+
+遍历 `20-知识库/05-问答/` 下所有 `status: active` 且含 `## 待确认事实` 区块的页面：
+
+1. **解析事实原子**：读取 `## 待确认事实` 下的每个列表项
+   ```
+   - **事实**：描述
+     - 类型：组织事实/统计数据/观点/定义
+     - 来源：[[页面链接]]
+     - 目标页面：[[目标页面]]
+     - 置信度影响：+0.05
+   ```
+2. **合并到目标页面**：
+   - 读取目标页面内容
+   - 在适当位置添加事实引用（或更新已有内容）
+   - 增量更新目标页面的 `confidence_factors.source_count`
+   - 增量更新目标页面的 `confidence_factors.last_confirmed`
+3. **标记已处理**：
+   - 将 `## 待确认事实` 改为 `## 已吸收事实`
+   - 若全部事实已吸收，将结晶页 `status` 设为 `absorbed`
+4. **报告**：列出本次吸收了哪些事实、更新了哪些目标页面
 
 ### 9. Check Raw Materials Integrity
 
@@ -218,6 +270,30 @@ Report structure:
 
 1. ...
 2. ...
+
+### 6. 置信度概览
+
+| 分类 | 页面数 | 平均置信度 | 最低 | 最高 |
+|------|--------|-----------|------|------|
+| 实体 | N | 0.XX | 0.XX | 0.XX |
+| 概念 | N | 0.XX | 0.XX | 0.XX |
+| 主题 | N | 0.XX | 0.XX | 0.XX |
+| 问答 | N | 0.XX | 0.XX | 0.XX |
+
+### 7. 状态分布
+
+| 状态 | 计数 |
+|------|------|
+| active | N |
+| fading | N |
+| superseded | N |
+| archived | N |
+
+### 8. 结晶吸收
+
+- 本次吸收事实数：N
+- 已标记 absorbed：N
+- 仍在待确认：N
 ```
 
 ### 11. Update Stats (Optional)

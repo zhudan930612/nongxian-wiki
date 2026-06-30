@@ -84,7 +84,17 @@ updated: YYYY-MM-DD
 tags: [source, tag1, tag2]
 source: 10-原始资料/XX-分类/YYYYMMDD-原标题.扩展名
 author: 作者名
+confidence: 0.80
+confidence_factors:
+  source_count: 1
+  last_confirmed: YYYY-MM-DD
+  contradiction_count: 0
+  cross_references: 0
+status: active
 ---
+```
+
+> 来源页初次创建时，`source_count: 1`（自身作为第一个来源），`last_confirmed` 设为创建日期。`cross_references` 初始为 0，后续其他页面链接时增量更新。
 
 # 资料标题
 
@@ -138,6 +148,7 @@ In the source summary page, add wiki links to relevant entities (people, organiz
 - **Default**: Do NOT create the entity page during ingest — leave it as a gray link (forward reference)
 - **Exception**: Only create the entity page if it is the **core topic** of this ingest AND you have sufficient information to write a meaningful page
 - If creating: MUST use `20-知识库/01-实体/01-实体名.md` full path, NEVER at root
+- If creating: frontmatter 需包含 v2 增强字段（见下方统一规则）
 
 ### 8. Reference Concept Pages (Forward References)
 
@@ -147,6 +158,7 @@ In the source summary page, add wiki links to relevant concepts (definitions, me
 - **Default**: Do NOT create the concept page during ingest — leave it as a gray link
 - **Exception**: Only create if the concept is the **core topic** of this ingest AND you have sufficient information
 - If creating: MUST use `20-知识库/02-概念/02-概念名.md` full path, NEVER at root
+- If creating: frontmatter 需包含 v2 增强字段（见下方统一规则）
 
 ### 9. Reference Theme Pages (Forward References)
 
@@ -156,6 +168,36 @@ In the source summary page, add wiki links to relevant themes (cross-cutting syn
 - **Default**: Do NOT create the theme page during ingest — leave it as a gray link
 - **Exception**: Only create if the theme is the core contribution of this ingest
 - If creating: MUST use `20-知识库/03-主题/03-主题名.md` full path, NEVER at root
+- If creating: frontmatter 需包含 v2 增强字段（见下方统一规则）
+
+#### 创建新实体/概念/主题页时的 frontmatter 统一规则
+
+当例外情况触发创建新页面时，frontmatter 应包括：
+
+```yaml
+---
+title: 页面名称
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+tags: [entity/concept/theme]
+confidence: 0.70
+confidence_factors:
+  source_count: 1
+  last_confirmed: YYYY-MM-DD
+  contradiction_count: 0
+  cross_references: 1
+status: active
+---
+```
+
+### 9a. 增量更新引用目标页面的统计字段
+
+当来源页引用已有实体/概念/主题页面时（即链接指向已存在的页面）：
+1. 读取目标页面的 frontmatter
+2. 对 `confidence_factors.source_count` +1
+3. 对 `confidence_factors.cross_references` +1
+4. 更新 `confidence_factors.last_confirmed` 为当前日期
+5. 写回目标页面
 
 ### 10. Update Index
 
