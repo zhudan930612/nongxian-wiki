@@ -93,6 +93,7 @@ Verify consistency:
 - All pages have required YAML frontmatter (`title`, `created`, `updated`, `tags`)
 - File names follow the vault's naming convention
 - Page titles (h1) are in Chinese where required
+- **文件名日期检查**：文件名中的 `YYYYMMDD` 前缀应与 frontmatter 中的 `created` 日期一致，而非文档自带的 `published` 或其他日期。若不一致则标记为违规。
 
 ### 9. Check Raw Materials Integrity
 

@@ -57,6 +57,10 @@ Classify each usable file and move it to the appropriate raw-material folder wit
 - Reports / policies / data / images → `10-原始资料/03-资源/`
 - User notes / ideas → create or update pages directly in `20-知识库/`
 
+**日期规则**：文件名中的 `YYYYMMDD` **始终使用 frontmatter 中的 `created` 日期**，而非文档自带的发布日期（如 `published` 字段中的日期）。
+- 在重命名前，检查目标日期+标题是否与已有文件冲突
+- 如有冲突，在标题后添加区分标识（如序号）
+
 **Classification boundary rule**: If a file clearly does not fit the existing three categories (e.g., audio, video, special-format datasets, interview transcripts), pause and ask the user whether to add a new category. Do not create new folders like `04-XX/` without user confirmation, and do not temporarily misfile materials.
 
 ### 5. Discuss Key Points with User
