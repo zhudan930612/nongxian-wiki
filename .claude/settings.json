@@ -11,7 +11,14 @@
       "Bash(git commit -m 'refactor: 为原始资料文件名添加日期前缀 *)",
       "Bash(git commit -m 'refactor: 为知识库来源页面添加日期前缀并修正链接 *)",
       "Bash(git reset *)",
-      "Bash(git commit -m 'fix: 更新知识库链接以匹配重命名后的原始资料 *)"
+      "Bash(git commit -m 'fix: 更新知识库链接以匹配重命名后的原始资料 *)",
+      "Bash(git commit -m 'chore: 添加杂项文件 *)",
+      "Edit(/.claude/skills/llm-wiki-ingest/**)",
+      "Edit(/.claude/skills/llm-wiki-lint/**)",
+      "Bash(del \"01-华宇科技.md\" \"四农普遥感技术.md\")",
+      "Bash(git commit -m 'fix\\(skills\\): 统一 ingest/lint 规则，防止生成空文件 *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m 'chore: 删除根目录的两个空文件 *)"
     ]
   }
 }
