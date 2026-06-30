@@ -52,6 +52,29 @@ Look for:
 
 Report specific contradictions with page paths and suggested resolutions.
 
+#### 3a. 矛盾自动裁决
+
+对上一节发现的矛盾，执行自动裁决：
+
+1. **评估依据**（按优先级）：
+   - 来源权威性：政策文件 > 学术论文 > 行业报告 > 媒体报道 > 会议沟通
+   - 来源时效性：更新日期越近越可信
+   - 页面置信度：confidence 越高越可信
+   - 支持来源数：支持某一方的来源数量更多
+
+2. **裁决输出格式**：
+   ```
+   矛盾：[页面A] 说"X"，[页面B] 说"Y"
+   裁决：采用[页面B]的说法
+   理由：[页面B]引用2025年新政（权威性：政策文件），[页面A]仅引用2022年旧版
+   操作：已将[页面A]设为 superseded，添加 superseded_by 指向[页面B]
+   ```
+
+3. **执行修复**：
+   - 将被裁决为劣势的页面设为 `status: superseded`
+   - 添加 `superseded_by` 指向优势页面
+   - 在优势页面中添加 `supersedes` 指向劣势页面
+
 ### 4. Check for Outdated Claims
 
 Identify content that may no longer be accurate:
@@ -87,6 +110,16 @@ Find pages with no inbound wiki links:
 - If a page is never linked, flag it as orphan
 - Suggest where it should be linked from, or whether it should be removed
 
+#### 5a. 孤立页面自动修复
+
+对上一节发现的孤立页面，执行自动修复：
+
+1. 对每个孤立页面，读取其标题和正文前 200 字，确定主题
+2. 在全 vault 中搜索包含相同关键词的页面
+3. 在匹配页面中找到最合适的位置，添加 `[[孤立页面名]]` 链接
+4. 如果找不到合适的匹配页面，在孤立页面末尾添加 `## 待链接` 区段
+5. 在报告中记录：已修复 N 个、无法修复 M 个及其原因
+
 ### 6. Check for Missing Concept Pages
 
 Scan pages for wiki links that point to non-existent pages:
@@ -107,6 +140,18 @@ Scan pages for wiki links that point to non-existent pages:
 4. **活跃引用检测**：检查 `status: superseded` 的页面是否还被其他活跃页面引用
    - 若有，在 lint 报告中列出过时引用，建议修复
 5. **更新取代日志**：将新发现的取代关系追加到 supersession-log.md
+
+#### 6b. 断裂链接自动修复
+
+对步骤 6 中发现的断裂链接（指向不存在页面的 `[[链接]]`）：
+
+1. **别名匹配**：检查链接文本是否与某个已有页面的 title 或 alias 匹配
+   - 如果匹配 → 自动修正链接路径为标准格式
+2. **频繁引用自动创建**：同一断裂链接被引用 ≥3 次
+   - 自动创建目标页面，补充基本 frontmatter 和结构
+   - 在页面中添加"自动创建"标记和引用来源
+3. **低频断裂记录**：引用 1-2 次的断裂链接
+   - 记录到 lint 报告，标注"低优先级"
 
 ### 7. Check Cross-Reference Completeness
 

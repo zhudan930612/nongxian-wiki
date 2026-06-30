@@ -316,3 +316,12 @@ tags: [system, log]
 - 更新 ingest skill：增加关系抽取步骤 9b
 - 更新 lint skill：增加图谱验证步骤 8c
 - 更新 stats.md：增加图谱关系数和孤立实体数字段
+
+---
+
+## [2026-06-30] enhance | 阶段 3 自动化与自愈
+
+- 更新 CLAUDE.md：增加会话启动流程、自动化章节、Lint 升级为"检查与自愈"
+- 更新 lint skill：增加矛盾自动裁决（3a）、孤立页面修复（5a）、断裂链接修复（6b）
+- 更新 .claude/settings.json：增加 SessionStart hook
+- 后移除定时 lint（用户选择手动执行），同步清理 CLAUDE.md 中相关描述

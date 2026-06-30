@@ -20,5 +20,18 @@
       "Bash(git rm *)",
       "Bash(git commit -m 'chore: 删除根目录的两个空文件 *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "echo nongbaoyun-vault-start",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      }
+    ]
   }
 }
