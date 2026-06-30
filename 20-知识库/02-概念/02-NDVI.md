@@ -4,7 +4,7 @@ created: 2026-06-25
 updated: 2026-06-25
 tags: [concept, 遥感, 光谱指数, 农业保险]
 aliases: [归一化植被指数, Normalized Difference Vegetation Index]
-confidence: 0.75
+confidence: 0.65
 confidence_factors:
   source_count: 1
   last_confirmed: 2026-06-25
