@@ -348,3 +348,14 @@ tags: [system, log]
 - 发现链接格式不规范（完整路径/缺前缀）→ 已批量修复（78个文件移除前缀、96处补编号）
 - lint 报告为临时快照，已删除（数据已持久化至各页面 frontmatter）
 - 更新 stats.md 平均置信度和最后检查日期
+
+---
+
+## [2026-06-30] refactor | CLAUDE.md 精简重构
+
+- 审计 CLAUDE.md 结构，按 Skills/Hooks/Settings/Conventions/Core 六维度分类
+- 创建 `.claude/skills/llm-wiki-query/SKILL.md` — 查询工作流独立 skill
+- 创建约定页：`naming-convention.md`（命名规则+文件操作）、`knowledge-graph-relations.md`（关系类型表）
+- 合并链接规范到 `forward-reference-convention.md`
+- CLAUDE.md 精简 37%：移除 Lint 扩展步骤重复内容、提取详细工作流到 skill 文件、用 Wiki 链接引用替代内联规范
+- CLAUDE.md：297 行 → 179 行
