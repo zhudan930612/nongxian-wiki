@@ -199,6 +199,20 @@ status: active
 4. 更新 `confidence_factors.last_confirmed` 为当前日期
 5. 写回目标页面
 
+### 9b. 知识图谱关系抽取
+
+创建来源摘要页时，扫描正文中的实体关系模式，自动生成关系条目：
+
+1. **识别关系动词**：在正文中搜索以下模式：
+   - "[实体A]研究[概念B]" → type: 研究
+   - "[实体A]任职于[实体B]" → type: 任职于
+   - "[实体A]与[实体B]合作" → type: 合作
+   - "[实体A]监管[实体B]" → type: 监管 / 制定政策
+   - "[实体A]是[实体B]的下属/子公司" → type: 隶属
+2. **去重**：检查 `20-知识库/00-索引/knowledge-graph.md` 中是否已有相同的关系记录（相同的 source + type + target）
+3. **追加**：将新关系追加到 knowledge-graph.md 的 relationships 列表末尾
+4. **置信度继承**：新关系的 confidence 取来源页 confidence 值的 80%
+
 ### 10. Update Index
 
 Add the new source to the appropriate section of `20-知识库/00-索引/index.md`.

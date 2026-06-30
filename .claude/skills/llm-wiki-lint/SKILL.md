@@ -170,6 +170,34 @@ For each misplaced file:
    - 若全部事实已吸收，将结晶页 `status` 设为 `absorbed`
 4. **报告**：列出本次吸收了哪些事实、更新了哪些目标页面
 
+### 8c. 知识图谱验证
+
+遍历 `20-知识库/00-索引/knowledge-graph.md` 中所有关系记录，执行以下检查：
+
+1. **孤立实体检测**：
+   - 获取所有实体和概念页面的列表（01-实体/、02-概念/）
+   - 检查每个实体是否出现在至少一条关系中
+   - 列出孤立实体（没有任何关系的页面）
+   - 基于页面内容推断可能的关系类型和目标
+
+2. **残缺关系检测**：
+   - 检查每条关系是否有 source、type、target、sources 四个字段
+   - 检查 source 和 target 是否指向存在的页面
+   - 报告缺少必要字段或指向不存在页面的关系
+
+3. **单向关系合理性检查**：
+   - 对 bidirectional: false 的关系，根据 type 判断是否需要双向
+   - 规则：合作、竞争应双向；研究、监管一般单向
+   - 报告不合理的单向设置
+
+4. **置信度衰减**：
+   - 读取每条关系的来源页的 last_confirmed
+   - 如果超过 180 天，confidence 自动乘以 0.8
+   - 更新知识图谱中的 confidence 值
+
+5. **更新图谱统计**：
+   - 在报告中增加图谱统计：关系总数、孤立实体数、待修复数
+
 ### 9. Check Raw Materials Integrity
 
 Verify that every source page in `20-知识库/04-来源/` has a corresponding raw material in `10-原始资料/` and that the `source` path in frontmatter is correct.
