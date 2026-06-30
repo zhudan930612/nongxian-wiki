@@ -3,6 +3,13 @@ title: 客户现状模板
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [template, 客户现状]
+confidence: 0.80
+confidence_factors:
+  source_count: 1
+  last_confirmed: YYYY-MM-DD
+  contradiction_count: 0
+  cross_references: 1
+status: active
 ---
 
 # {{公司名称}} — 客户现状
