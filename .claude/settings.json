@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m 'feat\\(skills\\): 完善 ingest/lint 技能的日期文件名规则 *)",
+      "Bash(git commit -m 'feat\\(ingest\\): 摄取 2026-06-30 四份新资料 *)",
+      "Bash(cd \"E:/wiki/nongbaoyun\" && git diff --stat -- ':!.claude' 2>/dev/null | tail -20)",
+      "Bash(git diff *)",
+      "Bash(xargs -0 -I {} sh -c 'echo \"$\\(git diff --name-status -- \"$1\" | head -1 | cut -f1\\) $1\"' _ {})",
+      "Bash(git add *)",
+      "Bash(git commit -m 'chore: 更新 skill 文件中原文日期优先级规则 *)",
+      "Bash(git commit -m 'refactor: 为原始资料文件名添加日期前缀 *)",
+      "Bash(git commit -m 'refactor: 为知识库来源页面添加日期前缀并修正链接 *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m 'fix: 更新知识库链接以匹配重命名后的原始资料 *)"
+    ]
+  }
+}
