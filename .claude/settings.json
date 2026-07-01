@@ -19,7 +19,21 @@
       "Bash(git commit -m 'fix\\(skills\\): 统一 ingest/lint 规则，防止生成空文件 *)",
       "Bash(git rm *)",
       "Bash(git commit -m 'chore: 删除根目录的两个空文件 *)",
-      "Bash(git commit -v '-mfeat: 新增 claude-md-audit 技能 — CLAUDE.md 结构审查 *)"
+      "Bash(git commit -v '-mfeat: 新增 claude-md-audit 技能 — CLAUDE.md 结构审查 *)",
+      "Bash(mkdir -p .claude/skills/mineru-parse/scripts)",
+      "Edit(/.claude/skills/mineru-parse/**)",
+      "Bash(.claude/skills/mineru-parse/.venv/Scripts/python.exe .claude/skills/mineru-parse/scripts/mineru_parse.py *)",
+      "Bash(cd \"E:/wiki/nongbaoyun/.claude/skills/mineru-parse\" && uv venv .venv && uv pip install --python .venv/Scripts/python requests)",
+      "Bash(cd \"E:/wiki/nongbaoyun/.claude/skills/mineru-parse\" && uv venv .venv && uv pip install --python .venv/Scripts/python -r requirements.txt)",
+      "Bash(python3 -)",
+      "Edit(E:\\\\wiki\\\\nongbaoyun\\\\.claude\\\\settings.json)",
+      "Bash(\"E:/wiki/nongbaoyun/.claude/skills/mineru-parse/.venv/Scripts/python.exe\" \"E:/wiki/nongbaoyun/.claude/skills/mineru-parse/scripts/mineru_parse.py\" --help)",
+      "Bash(\"E:/wiki/nongbaoyun/.claude/skills/mineru-parse/.venv/Scripts/python.exe\" \"E:/wiki/nongbaoyun/.claude/skills/mineru-parse/scripts/mineru_parse.py\" \"00-收件箱/test.pdf\" --output-dir \"/tmp/mineru-test\")",
+      "Bash(mv \"10-原始资料/99-PDF原件/03-行业报告/20260701-2024年农业保险市场发展综述.pdf\" \"00-收件箱/2024年农业保险市场发展综述_可搜索.pdf\")",
+      "Bash(rm -f \"10-原始资料/03-行业报告/20260701-2024年农业保险市场发展综述.md\")",
+      "Bash(rm -f \"20-知识库/04-来源/03-行业报告/20260701-2024年农业保险市场发展综述.md\")",
+      "Bash(rm -rf \"10-原始资料/99-PDF原件\")",
+      "Bash(rm -rf \"00-收件箱/PDF解析\"/*)"
     ]
   },
   "hooks": {
