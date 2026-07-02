@@ -28,12 +28,115 @@ tags: [system, index, knowledge-graph]
 ## 关系列表
 
 ```yaml
-relationships: []
+relationships:
+  - source: 20-知识库/01-实体/01-庹国柱
+    type: 研究
+    target: 20-知识库/02-概念/02-农业保险
+    sources:
+      - 20-知识库/04-来源/06-媒体报道/03-专家观点/20190101-细节看保险：农险应收保费难题盼解
+    confidence: 0.64
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-庹国柱
+    type: 研究
+    target: 20-知识库/02-概念/02-应收保费
+    sources:
+      - 20-知识库/04-来源/06-媒体报道/03-专家观点/20190101-细节看保险：农险应收保费难题盼解
+    confidence: 0.64
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-庹国柱
+    type: 关注/痛点
+    target: 20-知识库/02-概念/02-应收保费
+    sources:
+      - 20-知识库/04-来源/06-媒体报道/03-专家观点/20190101-细节看保险：农险应收保费难题盼解
+    confidence: 0.64
+    bidirectional: false
+
+  - source: 20-知识库/02-概念/02-应收保费
+    type: 是痛点
+    target: 20-知识库/01-实体/01-中国人保财险
+    sources:
+      - 20-知识库/04-来源/06-媒体报道/03-专家观点/20190101-细节看保险：农险应收保费难题盼解
+    confidence: 0.64
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-中国科学院遥感与数字地球研究所
+    type: 合作
+    target: 20-知识库/01-实体/01-中国人保财险内蒙古分公司
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20250623-遥感在种植业保险估损中的应用
+    confidence: 0.68
+    bidirectional: true
+
+  - source: 20-知识库/01-实体/01-唐金成
+    type: 研究
+    target: 20-知识库/02-概念/02-绿色保险
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260220-绿色保险创新发展的国际经验与启示
+    confidence: 0.66
+    bidirectional: false
+
+  - source: 20-知识库/02-概念/02-绿色保险
+    type: 受政策影响
+    target: 20-知识库/02-概念/02-双碳目标
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260220-绿色保险创新发展的国际经验与启示
+    confidence: 0.66
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-自然资源部
+    type: 制定政策
+    target: 20-知识库/02-概念/02-卫星遥感监测
+    sources:
+      - 20-知识库/04-来源/01-政策法规/20231219-统筹规范耕地保护卫星遥感监测工作的通知
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-自然资源部
+    type: 制定政策
+    target: 20-知识库/02-概念/02-耕地保护
+    sources:
+      - 20-知识库/04-来源/01-政策法规/20231219-统筹规范耕地保护卫星遥感监测工作的通知
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-阳光农业相互保险公司
+    type: 试点
+    target: 20-知识库/02-概念/02-卫星遥感+农业保险
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20240606-卫星遥感+农业保险模式的应用实践——以黑龙江省黑河市为例
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-国家金融监督管理总局
+    type: 制定政策
+    target: 20-知识库/02-概念/02-农业保险地块信息库
+    sources:
+      - 20-知识库/04-来源/01-政策法规/20251210-全国农业保险地块基础信息库建设试点工作方案
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-银保信公司
+    type: 提供产品
+    target: 20-知识库/02-概念/02-农业保险地块信息库
+    sources:
+      - 20-知识库/04-来源/01-政策法规/20251210-全国农业保险地块基础信息库建设试点工作方案
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/02-概念/02-农业保险地块信息库
+    type: 受政策影响
+    target: 20-知识库/02-概念/02-精准承保理赔
+    sources:
+      - 20-知识库/04-来源/01-政策法规/20251210-全国农业保险地块基础信息库建设试点工作方案
+    confidence: 0.68
+    bidirectional: false
 ```
 
 ## 注意事项
 
 1. 每条关系必须包含 `source`、`type`、`target`、`sources` 四个字段
-2. `source` 和 `target` 使用相对路径格式的页面标识，如 `01-实体/01-易福金`、`02-概念/02-农业保险`，**不带 `[[ ]]` Wiki 链接语法**（知识图谱 YAML 为纯数据）
+2. `source` 和 `target` 使用完整路径格式的页面标识，如 `20-知识库/01-实体/01-易福金`、`20-知识库/02-概念/02-农业保险`，**不带 `[[ ]]` Wiki 链接语法**（知识图谱 YAML 为纯数据）
 3. `bidirectional: true` 表示双向关系，反向时不需要重复记录
 4. 关系的 `confidence` 初始继承来源页置信度的 80%，lint 时校正
