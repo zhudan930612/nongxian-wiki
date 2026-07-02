@@ -132,6 +132,46 @@ relationships:
       - 20-知识库/04-来源/01-政策法规/20251210-全国农业保险地块基础信息库建设试点工作方案
     confidence: 0.68
     bidirectional: false
+
+  - source: 20-知识库/01-实体/01-庹国柱
+    type: 研究
+    target: 20-知识库/02-概念/02-双精准
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260625-如何看待和解决农业保险双精准问题
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-易福金
+    type: 研究
+    target: 20-知识库/02-概念/02-双精准
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260625-如何看待和解决农业保险双精准问题
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-人保财险
+    type: 提供产品
+    target: 20-知识库/02-概念/02-风险减量
+    sources:
+      - 20-知识库/04-来源/03-行业报告/20260625-全周期数智化风险减量服务价值链研究
+    confidence: 0.66
+    bidirectional: false
+
+  - source: 20-知识库/01-实体/01-孙蓉
+    type: 研究
+    target: 20-知识库/02-概念/02-两虚问题
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260625-３Ｓ技术赋能下的政策性农业保险精准监管
+    confidence: 0.68
+    bidirectional: false
+
+  - source: 20-知识库/02-概念/02-3S技术
+    type: 赋能
+    target: 20-知识库/02-概念/02-精准监管
+    sources:
+      - 20-知识库/04-来源/02-学术论文/20260625-３Ｓ技术赋能下的政策性农业保险精准监管
+    confidence: 0.68
+    bidirectional: false
 ```
 
 ## 注意事项
