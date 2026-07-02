@@ -369,9 +369,10 @@ extraction_quality: unverified
 def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path: str, verbose: bool) -> str:
     """Keep images in a plain `images/` dir and use relative references.
 
-    This matches the vault archive layout where the whole directory is later
-    moved to `99-PDF原件/{category}/{name}/` and the markdown keeps using
-    relative `images/...` links.
+    Images are renamed to sequential numbers to keep filenames clean and
+    consistent, while still matching the vault archive layout where the whole
+    directory is later moved to `99-PDF原件/{category}/{name}/` without
+    rewriting markdown links.
     """
     old_md = output_dir / "full.md"
     images_dir = output_dir / "images"
@@ -383,11 +384,29 @@ def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path:
 
     new_md = output_dir / f"{base_name}.md"
 
+    # Rename image files to {date}_{time}_{seq:03d}.{ext}
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_files = sorted(
+        (p for p in images_dir.iterdir() if p.is_file()),
+        key=lambda p: p.stat().st_mtime,
+    )
+    rename_map: dict[str, str] = {}
+    for idx, img_path in enumerate(image_files, start=1):
+        new_name = f"{timestamp}_{idx:03d}{img_path.suffix.lower()}"
+        new_path = images_dir / new_name
+        img_path.rename(new_path)
+        rename_map[img_path.name] = new_name
+
     # Read markdown and normalize image references
     md_content = old_md.read_text(encoding="utf-8")
 
-    # Decode percent-encoded spaces in image names so local filesystem names match
-    md_content = md_content.replace("images/%20", "images/ ")
+    for old_name, new_name in rename_map.items():
+        old_ref_md = f"images/{old_name}"
+        new_ref_md = f"images/{new_name}"
+        md_content = md_content.replace(old_ref_md, new_ref_md)
+
+        old_ref_md_alt = f"images/{old_name.replace(' ', '%20')}"
+        md_content = md_content.replace(old_ref_md_alt, new_ref_md)
 
     # Add figure captions to bare image references
     lines = md_content.splitlines()
@@ -493,7 +512,7 @@ def process_local_files(file_paths: list[str], output_dir: Path, token: str, arg
                     "input": local_path,
                     "output_dir": str(file_output_dir),
                     "markdown_file": str(file_output_dir / f"{base_name}.md"),
-                    "images_dir": str(file_output_dir / f"{token}.images"),
+                    "images_dir": str(file_output_dir / "images"),
                     "state": "done",
                     "error": None,
                 })
@@ -535,7 +554,7 @@ def process_url(file_url: str, output_dir: Path, token: str, args: argparse.Name
             "input": file_url,
             "output_dir": str(file_output_dir),
             "markdown_file": str(file_output_dir / f"{base_name}.md"),
-            "images_dir": str(file_output_dir / f"{token}.images"),
+            "images_dir": str(file_output_dir / "images"),
             "state": "done",
             "error": None,
         })
