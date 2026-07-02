@@ -1,0 +1,25 @@
+# 行尾统一策略：仓库内所有文本文件以 LF 存储，检出时也保持 LF。
+# 覆盖各机器的 core.autocrlf 设置，杜绝 CRLF/LF 反复触发的伪改动。
+* text=auto eol=lf
+
+# 二进制类型：禁止任何行尾/编码转换
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.svg   text eol=lf
+*.zip   binary
+*.gz    binary
+*.7z    binary
+*.docx  binary
+*.xlsx  binary
+*.pptx  binary
+*.mp3   binary
+*.mp4   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
