@@ -163,7 +163,7 @@ source_pdf: <input_path_or_url>
 type: fulltext
 extracted_by: mineru
 extracted_date: 2026-07-01
-extraction_quality: good
+extraction_quality: unverified
 ---
 ```
 

@@ -360,7 +360,7 @@ source_pdf: {source_path}
 type: fulltext
 extracted_by: mineru
 extracted_date: {today}
-extraction_quality: good
+extraction_quality: unverified
 ---
 
 """
