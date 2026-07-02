@@ -2,22 +2,15 @@
 """
 finalize_ingest.py
 
-将 mineru-parse 抽取产物（00-收件箱/PDF解析/<stem>/）连同原始 PDF 搬迁到 vault 归档位，
-并完成图片目录重命名、图片引用改写、frontmatter 定稿、原始资料索引插入、空壳清理。
-
-对应 llm-wiki-ingest SKILL 步骤 4b 的确定性实现。仅用标准库。
+将 mineru-parse 抽取产物整理到 vault 归档位：
+- 全文 md 落到 10-原始资料/{分类}/YYYYMMDD-原标题.md
+- 原始 PDF 和 图片目录 落到 10-原始资料/99-PDF原件/{分类}/YYYYMMDD-原标题/ 下（按篇隔离）
+- md 内图片相对引用 images/x.jpg 改写为指向 99-PDF原件 的 Obsidian wikilink
 
 用法：
   python finalize_ingest.py --stem <PDF文件名去扩展名> \
       --category <7类之一> --name <YYYYMMDD-原标题> --title <原标题> \
       [--quality good|partial] [--images auto|keep|drop] [--vault-root <path>]
-
-约定路径（均相对 vault 根）：
-  解析产物   00-收件箱/PDF解析/<stem>/<stem>.md  +  <token>.images/
-  原始 PDF   00-收件箱/<stem>.pdf
-  归档 PDF   10-原始资料/99-PDF原件/<category>/<name>.pdf
-  全文 md    10-原始资料/<category>/<name>.md
-  归档图片   10-原始资料/99-PDF原件/<category>/<name>.images/
 """
 
 from __future__ import annotations
@@ -34,23 +27,10 @@ CATEGORIES = {
     "05-产品与公司", "06-媒体报道", "07-会议沟通",
 }
 
-# 匹配 mineru 产出的图片引用：![任意alt](<token>.images/<file>)
-IMG_REF_RE = re.compile(r'!\[[^\]]*\]\(([0-9A-Za-z_]+\.images)/([^)]+)\)')
-
 
 def fail(msg: str, code: int = 1):
     print(json.dumps({"success": False, "error": msg}, ensure_ascii=False, indent=2))
     sys.exit(code)
-
-
-def find_token_images_dir(parsed_dir: Path) -> Path | None:
-    """在解析目录下找形如 <token>.images 的图片目录。"""
-    candidates = [d for d in parsed_dir.iterdir() if d.is_dir() and d.name.endswith(".images")]
-    if not candidates:
-        return None
-    if len(candidates) > 1:
-        fail(f"解析目录下存在多个 .images 目录，无法确定：{[c.name for c in candidates]}")
-    return candidates[0]
 
 
 def main() -> int:
@@ -62,7 +42,7 @@ def main() -> int:
     ap.add_argument("--quality", default="good", choices=["good", "partial"],
                     help="LLM 校验后的抽取质量（默认 good）")
     ap.add_argument("--images", default="auto", choices=["auto", "keep", "drop"],
-                    help="图片处理：auto=有引用则搬迁改写/无引用则删；keep=一律搬迁保留；drop=一律删")
+                    help="图片处理：auto=md有引用则保留并改写/无引用则删；keep=保留并改写；drop=删除")
     ap.add_argument("--vault-root", default=".", help="vault 根目录（默认当前目录）")
     args = ap.parse_args()
 
@@ -75,59 +55,55 @@ def main() -> int:
     parsed_dir = root / "00-收件箱" / "PDF解析" / stem
     src_md = parsed_dir / f"{stem}.md"
     src_pdf = root / "00-收件箱" / f"{stem}.pdf"
+    src_images = parsed_dir / "images"
 
-    pdf_dst_dir = root / "10-原始资料" / "99-PDF原件" / cat
     md_dst_dir = root / "10-原始资料" / cat
-    pdf_dst = pdf_dst_dir / f"{name}.pdf"
+    archive_dir = root / "10-原始资料" / "99-PDF原件" / cat / name
+    archive_pdf = archive_dir / f"{name}.pdf"
+    archive_images = archive_dir / "images"
     md_dst = md_dst_dir / f"{name}.md"
-    images_dst = pdf_dst_dir / f"{name}.images"
 
     # --- 前置校验 ---
     if not src_md.exists():
         fail(f"未找到全文 md：{src_md}")
     if not src_pdf.exists():
         fail(f"未找到原始 PDF：{src_pdf}")
-    # 防覆盖
-    for p in (pdf_dst, md_dst, images_dst):
+    for p in (md_dst, archive_dir):
         if p.exists():
             fail(f"目标已存在，拒绝覆盖：{p.relative_to(root)}（请先清理或换 name）")
-
-    pdf_dst_dir.mkdir(parents=True, exist_ok=True)
-    md_dst_dir.mkdir(parents=True, exist_ok=True)
 
     text = src_md.read_text(encoding="utf-8")
 
     # --- 图片处理 ---
-    token_dir = find_token_images_dir(parsed_dir)
-    ref_matches = IMG_REF_RE.findall(text)          # [(dir, file), ...]
-    ref_count = len(ref_matches)
-    images_dir_files = (
-        [f for f in token_dir.iterdir() if f.is_file()] if token_dir and token_dir.exists() else []
-    )
-
-    images_result = None       # 归档后的相对路径
+    image_files = [f for f in src_images.iterdir() if f.is_file()] if src_images.exists() else []
+    ref_count = len(re.findall(r'!\[[^\]]*\]\(images/[^)]+\)', text))
     orphan_dropped = 0
+    keep_images = False
 
-    move_images = False
     if args.images == "keep":
-        move_images = bool(images_dir_files)
+        keep_images = bool(image_files)
     elif args.images == "drop":
-        move_images = False
+        keep_images = False
     else:  # auto
-        move_images = ref_count > 0 and bool(images_dir_files)
+        keep_images = ref_count > 0 and bool(image_files)
 
-    if move_images:
-        token_dir.rename(images_dst)
-        # 改写引用：![..](<token>.images/x) -> ![[99-PDF原件/{cat}/{name}.images/x]]
-        def _sub(m):
-            return f"![[99-PDF原件/{cat}/{name}.images/{m.group(2)}]]"
-        text = IMG_REF_RE.sub(_sub, text)
-        images_result = f"10-原始资料/99-PDF原件/{cat}/{name}.images"
+    if keep_images:
+        md_dst_dir.mkdir(parents=True, exist_ok=True)
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        archive_images.mkdir(parents=True, exist_ok=True)
+        for f in image_files:
+            shutil.copy2(f, archive_images / f.name)
+        # 改写 md 内图片引用：![..](images/x) -> ![[99-PDF原件/{cat}/{name}/images/x]]
+        # wikilink 不需要 alt 文本，直接指向图片路径
+        text = re.sub(
+            r'!\[[^\]]*\]\(images/([^)]+)\)',
+            lambda m: f'![[99-PDF原件/{cat}/{name}/images/{m.group(1)}]]',
+            text
+        )
     else:
-        # 不搬迁：删除孤立/空目录
-        if token_dir and token_dir.exists():
-            orphan_dropped = len(images_dir_files)
-            shutil.rmtree(token_dir)
+        if src_images.exists():
+            orphan_dropped = len(image_files)
+            shutil.rmtree(src_images)
 
     # --- frontmatter 改写 ---
     if not text.startswith("---"):
@@ -144,28 +120,32 @@ def main() -> int:
         return fm_text + f"{key}: {value}\n"
 
     fm = set_field(fm, "title", f"全文·{title}")
-    fm = set_field(fm, "source_pdf", f"10-原始资料/99-PDF原件/{cat}/{name}.pdf")
+    fm = set_field(fm, "source_pdf", f"10-原始资料/99-PDF原件/{cat}/{name}/{name}.pdf")
     fm = set_field(fm, "extraction_quality", args.quality)
     fm = set_field(fm, "extracted_by", "mineru")
 
     # --- 原始资料索引 ---
-    index_line = f"\n> 📎 **原始资料**：[[99-PDF原件/{cat}/{name}.pdf]]\n"
+    index_line = f"\n> 📎 **原始资料**：[[99-PDF原件/{cat}/{name}/{name}.pdf]]\n"
     body = parts[2]
     text = "---\n" + fm + "---\n" + index_line + body
 
-    # --- 落盘：先写 md，再移 PDF，最后清壳 ---
+    # --- 落盘 ---
+    md_dst_dir.mkdir(parents=True, exist_ok=True)
     md_dst.write_text(text, encoding="utf-8")
-    src_md.unlink()
-    src_pdf.rename(pdf_dst)
 
-    # 清理空壳解析目录（此时应已无 md / 图片目录）
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    src_pdf.rename(archive_pdf)
+
+    # 清理解析目录
     leftover = [p.name for p in parsed_dir.iterdir()] if parsed_dir.exists() else []
     if parsed_dir.exists():
         shutil.rmtree(parsed_dir)
 
+    images_result = f"10-原始资料/99-PDF原件/{cat}/{name}/images" if keep_images and archive_images.exists() else None
+
     result = {
         "success": True,
-        "pdf": f"10-原始资料/99-PDF原件/{cat}/{name}.pdf",
+        "pdf": f"10-原始资料/99-PDF原件/{cat}/{name}/{name}.pdf",
         "fulltext_md": f"10-原始资料/{cat}/{name}.md",
         "images_dir": images_result,
         "image_refs": ref_count,

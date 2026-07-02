@@ -136,9 +136,9 @@ For a single file or URL:
 <output-parent>/
 └── <document_stem>/
     ├── <document_stem>.md
-    └── 20260701_143052_a1b2.images/          # globally unique token
-        ├── 20260701_143052_a1b2_001.png
-        ├── 20260701_143052_a1b2_002.png
+    └── images/                     # plain relative images directory
+        ├── page_001.png
+        ├── figure_002.png
         └── ...
 ```
 
@@ -148,11 +148,13 @@ For a directory batch:
 <output-parent>/
 ├── document1/
 │   ├── document1.md
-│   └── 20260701_143052_a1b2.images/
+│   └── images/
 └── document2/
-│   ├── document2.md
-│   └── 20260701_143100_c3d4.images/
+    ├── document2.md
+    └── images/
 ```
+
+The markdown file uses **relative** image references (e.g. `![图 1](images/figure_002.png)`), so the whole directory can be moved as a unit without rewriting links.
 
 The markdown file includes YAML frontmatter:
 

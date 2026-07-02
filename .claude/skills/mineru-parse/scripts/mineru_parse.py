@@ -366,48 +366,28 @@ extraction_quality: unverified
 """
 
 
-def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path: str, verbose: bool) -> None:
-    """Rename images dir/images and update markdown references."""
+def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path: str, verbose: bool) -> str:
+    """Keep images in a plain `images/` dir and use relative references.
+
+    This matches the vault archive layout where the whole directory is later
+    moved to `99-PDF原件/{category}/{name}/` and the markdown keeps using
+    relative `images/...` links.
+    """
     old_md = output_dir / "full.md"
-    old_images_dir = output_dir / "images"
+    images_dir = output_dir / "images"
 
     if not old_md.exists():
         raise OutputError(f"full.md not found in extracted output: {output_dir}")
-    if not old_images_dir.exists():
+    if not images_dir.exists():
         raise OutputError(f"images/ not found in extracted output: {output_dir}")
 
-    # Generate a globally unique token for image assets
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    rand = secrets.token_hex(2)
-    token = f"{timestamp}_{rand}"
-
     new_md = output_dir / f"{base_name}.md"
-    new_images_dir = output_dir / f"{token}.images"
 
-    # Rename images directory
-    old_images_dir.rename(new_images_dir)
-
-    # Rename image files to {token}_{seq}.{ext}
-    image_files = sorted(new_images_dir.iterdir(), key=lambda p: p.stat().st_mtime)
-    rename_map: dict[str, str] = {}
-    for idx, img_path in enumerate(image_files, start=1):
-        if not img_path.is_file():
-            continue
-        new_name = f"{token}_{idx:03d}{img_path.suffix.lower()}"
-        new_path = new_images_dir / new_name
-        img_path.rename(new_path)
-        rename_map[img_path.name] = new_name
-
-    # Read markdown and replace image references
+    # Read markdown and normalize image references
     md_content = old_md.read_text(encoding="utf-8")
 
-    for old_name, new_name in rename_map.items():
-        old_ref_md = f"images/{old_name}"
-        new_ref_md = f"{token}.images/{new_name}"
-        md_content = md_content.replace(old_ref_md, new_ref_md)
-
-        old_ref_md_alt = f"images/{old_name.replace(' ', '%20')}"
-        md_content = md_content.replace(old_ref_md_alt, new_ref_md)
+    # Decode percent-encoded spaces in image names so local filesystem names match
+    md_content = md_content.replace("images/%20", "images/ ")
 
     # Add figure captions to bare image references
     lines = md_content.splitlines()
@@ -415,7 +395,7 @@ def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path:
     fig_no = 0
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith("!") and f"{token}.images/" in stripped:
+        if stripped.startswith("!") and "images/" in stripped:
             fig_no += 1
             line = line.replace("![](", f"![图 {fig_no}](", 1)
             line = line.replace("![image](", f"![图 {fig_no}](", 1)
@@ -433,8 +413,8 @@ def normalize_images_and_markdown(output_dir: Path, base_name: str, source_path:
     # Remove old full.md
     old_md.unlink()
 
-    log(f"Saved {new_md.name} and {new_images_dir.name}/", verbose)
-    return token
+    log(f"Saved {new_md.name} and {images_dir.name}/", verbose)
+    return "images"
 
 
 def download_and_extract(zip_url: str, output_dir: Path, base_name: str, source_path: str, verbose: bool) -> str:
