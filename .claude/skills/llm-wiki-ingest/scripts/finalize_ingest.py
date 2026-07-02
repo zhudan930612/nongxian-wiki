@@ -93,11 +93,11 @@ def main() -> int:
         archive_images.mkdir(parents=True, exist_ok=True)
         for f in image_files:
             shutil.copy2(f, archive_images / f.name)
-        # 改写 md 内图片引用：![..](images/x) -> ![[99-PDF原件/{cat}/{name}/images/x]]
+        # 改写 md 内图片引用：![..](images/x) -> ![[10-原始资料/99-PDF原件/{cat}/{name}/images/x]]
         # wikilink 不需要 alt 文本，直接指向图片路径
         text = re.sub(
             r'!\[[^\]]*\]\(images/([^)]+)\)',
-            lambda m: f'![[99-PDF原件/{cat}/{name}/images/{m.group(1)}]]',
+            lambda m: f'![[10-原始资料/99-PDF原件/{cat}/{name}/images/{m.group(1)}]]',
             text
         )
     else:
@@ -125,7 +125,7 @@ def main() -> int:
     fm = set_field(fm, "extracted_by", "mineru")
 
     # --- 原始资料索引 ---
-    index_line = f"\n> 📎 **原始资料**：[[99-PDF原件/{cat}/{name}/{name}.pdf]]\n"
+    index_line = f"\n> 📎 **原始资料**：[[10-原始资料/99-PDF原件/{cat}/{name}/{name}.pdf]]\n"
     body = parts[2]
     text = "---\n" + fm + "---\n" + index_line + body
 

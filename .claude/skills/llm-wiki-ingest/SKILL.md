@@ -113,10 +113,10 @@ mineru 现在直接输出与归档一致的目录结构：
    ```
 3. **改写图片引用**：把 md 内相对引用 `![图 N](images/x.jpg)` 改写为指向归档图片的 Obsidian wikilink：
    ```markdown
-   ![[99-PDF原件/{分类}/YYYYMMDD-原标题/images/x.jpg]]
+   ![[10-原始资料/99-PDF原件/{分类}/YYYYMMDD-原标题/images/x.jpg]]
    ```
 4. frontmatter：`title: 全文·原标题`、`source_pdf` 指向归档 PDF、`extraction_quality` 定为 `--quality` 值、保留 `extracted_by: mineru`
-5. 正文开头插入 `> 📎 **原始资料**：[[99-PDF原件/{分类}/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]`
+5. 正文开头插入 `> 📎 **原始资料**：[[10-原始资料/99-PDF原件/{分类}/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]`
 6. 删除 `00-收件箱/PDF解析/<stem>/` 空壳
 7. stdout 打印 JSON（归档路径、图片引用数、孤立图片删除数、quality），据此核对
 
@@ -133,7 +133,7 @@ mineru 现在直接输出与归档一致的目录结构：
 10-原始资料/
 ├── {分类}/
 │   └── YYYYMMMDD-原标题.md                # 全文转录，可被 Grep 检索
-└── 99-PDF原件/{分类}/
+└── 10-原始资料/99-PDF原件/{分类}/
     └── YYYYMMMDD-原标题/                  # 每篇一个目录，不混放
         ├── YYYYMMMDD-原标题.pdf
         └── images/                        # 仅当 md 有图片引用时存在
@@ -151,12 +151,12 @@ extracted_date: YYYY-MM-DD
 extraction_quality: good             # 由 --quality 定稿：good / partial
 ---
 
-> 📎 **原始资料**：[[99-PDF原件/{分类}/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]
+> 📎 **原始资料**：[[10-原始资料/99-PDF原件/{分类}/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]
 
-<mineru 抽取的完整正文（图片引用已改写为指向 99-PDF原件 的 Obsidian 嵌入）>
+<mineru 抽取的完整正文（图片引用已改写为指向 10-原始资料/99-PDF原件 的 Obsidian 嵌入）>
 ```
 
-> 全文 md 为 PDF 的机器转录，**只读、可从 `99-PDF原件/` 下的 PDF 用 mineru-parse 重新生成**（重生后再跑 finalize）。表格/公式在纯文本转录中可能错位，涉及精确排版以 PDF 原件为准。
+> 全文 md 为 PDF 的机器转录，**只读、可从 `10-原始资料/99-PDF原件/` 下的 PDF 用 mineru-parse 重新生成**（重生后再跑 finalize）。表格/公式在纯文本转录中可能错位，涉及精确排版以 PDF 原件为准。
 
 ### 5. Create Source Summary Page
 
@@ -174,7 +174,7 @@ title: 资料标题
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [source, tag1, tag2]
-source: 10-原始资料/99-PDF原件/XX-分类/YYYYMMDD-原标题.pdf   # PDF 类指向 99-PDF原件；文本类指向 10-原始资料/XX-分类/…md
+source: 10-原始资料/99-PDF原件/XX-分类/YYYYMMDD-原标题.pdf   # PDF 类指向 99-PDF原件/；文本类指向 10-原始资料/XX-分类/…md
 author: 作者名
 confidence: 0.80
 confidence_factors:
@@ -194,7 +194,7 @@ status: active
 
 > 一句话摘要
 
-> 📎 **原始资料**：[[99-PDF原件/XX-分类/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]] · [[10-原始资料/XX-分类/YYYYMMDD-原标题.md|全文转录]]
+> 📎 **原始资料**：[[10-原始资料/99-PDF原件/XX-分类/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]] · [[10-原始资料/XX-分类/YYYYMMDD-原标题.md|全文转录]]
 
 ## 核心观点
 
@@ -251,7 +251,7 @@ status: active
 
 ## 来源
 
-- PDF 原件：[[99-PDF原件/XX-分类/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]
+- PDF 原件：[[10-原始资料/99-PDF原件/XX-分类/YYYYMMDD-原标题/YYYYMMDD-原标题.pdf]]
 - 全文转录：[[10-原始资料/XX-分类/YYYYMMDD-原标题.md]]（PDF 类才有）
 - 原文链接：...
 - 原载：...
@@ -377,8 +377,8 @@ LLM:
 1. Read all files in `00-收件箱/`
 2. Check for duplicates in `10-原始资料/`（含 `99-PDF原件/`）and `20-知识库/04-来源/`
 3. 用 `mineru-parse` 抽取每个 PDF 全文（`--is-ocr --enable-formula --enable-table --model-version vlm`）；缺 token / 网络错 / API 错 / 质量不过则**停止并报告**，不归档、不建来源页（唯一路径，无兜底）
-4. 定好分类/命名/标题后，运行 `finalize_ingest.py`：全文 md → `10-原始资料/{分类}/`；PDF 原件 + 图片目录 → `99-PDF原件/{分类}/YYYYMMDD-原标题/`（按篇隔离，孤立图片默认删除）；md 内图片引用改写为 `![[99-PDF原件/.../images/x.jpg]]`；frontmatter 定稿；md 开头插入原始资料索引（分类取自 7 类：政策法规/学术论文/行业报告/技术规范/产品与公司/媒体报道/会议沟通）
-5. Create source summary pages in `20-知识库/04-来源/` based on 全文 md, with wiki links (forward references); `source:` 指向 `99-PDF原件/` 下的 PDF
+4. 定好分类/命名/标题后，运行 `finalize_ingest.py`：全文 md → `10-原始资料/{分类}/`；PDF 原件 + 图片目录 → `10-原始资料/99-PDF原件/{分类}/YYYYMMDD-原标题/`（按篇隔离，孤立图片默认删除）；md 内图片引用改写为 `![[10-原始资料/99-PDF原件/.../images/x.jpg]]`；frontmatter 定稿；md 开头插入原始资料索引（分类取自 7 类：政策法规/学术论文/行业报告/技术规范/产品与公司/媒体报道/会议沟通）
+5. Create source summary pages in `20-知识库/04-来源/` based on 全文 md, with wiki links (forward references); `source:` 指向 `10-原始资料/99-PDF原件/` 下的 PDF
 6. Update `index.md`、`log.md`，并运行 `recompute_stats.py --ingest-date <today>` 重算 `stats.md`
 7. Remove processed files from `00-收件箱/`（finalize 已清 `PDF解析/<stem>/` 空壳）
 8. Report summary to user
