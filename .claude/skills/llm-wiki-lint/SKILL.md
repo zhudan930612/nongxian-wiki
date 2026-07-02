@@ -283,13 +283,13 @@ When a folder exceeds a threshold, analyze the contents to propose a natural spl
 3. **Propose the split** — Suggest specific subdirectory names, file counts per new subdir, and the migration steps (move files + update index links).
 4. **Honor user decision** — Present the proposal clearly and let the user approve before executing.
 
-> 当前状态参考（`04-来源/`）：
-> - `01-政策法规/` — 2 ✅
-> - `02-学术论文/` — 17 ✅
+> 当前状态参考（`04-来源/`），数字为快照，执行前应由 LLM 重新统计：
+> - `01-政策法规/` — 5 ✅
+> - `02-学术论文/` — 19 ✅
 > - `03-行业报告/` — 5 ✅
 > - `04-技术规范/` — 11 ✅
-> - `05-产品与公司/` — 4 ✅
-> - **`06-媒体报道/` — 83 🔶**
+> - `05-产品与公司/` — 5 ✅
+> - **`06-媒体报道/` — 85 🔶**
 > - `07-会议沟通/` — 32 ⚠️
 
 After confirming corrections, rebuild the `04-来源/` index in `index.md` to ensure all wiki links include the subdirectory prefix.

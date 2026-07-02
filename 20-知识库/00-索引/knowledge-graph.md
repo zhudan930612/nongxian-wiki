@@ -1,7 +1,7 @@
 ---
 title: 知识图谱
 created: 2026-06-30
-updated: 2026-06-30
+updated: 2026-07-02
 tags: [system, index, knowledge-graph]
 ---
 
@@ -234,7 +234,7 @@ relationships:
 
   - source: 01-实体/01-太保产险
     type: 案例/试点
-    target: 01-实体/客户现状/浙江太保
+    target: 01-实体/客户现状/01-浙江太保
     sources:
       - 04-来源/07-会议沟通/20260508-农险&浙江太保沟通
     confidence: 0.80
@@ -421,6 +421,6 @@ relationships:
 ## 注意事项
 
 1. 每条关系必须包含 `source`、`type`、`target`、`sources` 四个字段
-2. `source` 和 `target` 使用 `[[XX-分类/XX-名称]]` 格式
+2. `source` 和 `target` 使用相对路径格式的页面标识，如 `01-实体/01-易福金`、`02-概念/02-农业保险`，**不带 `[[ ]]` Wiki 链接语法**（知识图谱 YAML 为纯数据）
 3. `bidirectional: true` 表示双向关系，反向时不需要重复记录
 4. 关系的 `confidence` 初始继承来源页置信度的 80%，lint 时校正

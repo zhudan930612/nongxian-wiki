@@ -1,7 +1,7 @@
 ---
 title: 知识图谱关系类型
 created: 2026-06-30
-updated: 2026-06-30
+updated: 2026-07-02
 tags: [system, convention, knowledge-graph]
 aliases: [关系类型, 图谱关系, relationship types]
 ---
@@ -28,6 +28,7 @@ aliases: [关系类型, 图谱关系, relationship types]
 ## 使用说明
 
 - 每条关系记录应包含 `source`、`type`、`target`、`sources` 四个字段
+- `source` 和 `target` 使用相对路径格式的页面标识，如 `01-实体/01-易福金`、`02-概念/02-农业保险`，**不带 `[[ ]]` Wiki 链接语法**（知识图谱 YAML 为纯数据）
 - 合作和竞争关系应设为 `bidirectional: true`
 - 研究、监管等关系一般设为 `bidirectional: false`（单向）
 - 关系的 `confidence` 取自来源页置信度的 80%

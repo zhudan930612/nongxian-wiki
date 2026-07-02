@@ -365,9 +365,9 @@ Add a new entry to `20-知识库/00-索引/log.md` describing the ingest operati
 
 Remove processed files from `00-收件箱/`. Keep `README.md` and any files the user explicitly wants to retain.
 
-### 13. Update Todos
+### 13. Update Action Items
 
-Check `20-知识库/06-元/06-todo.md` and clear or update relevant items.
+If the ingest surfaced follow-up tasks or open questions, capture them in `20-知识库/00-索引/log.md` or crystallize into `05-问答/` pages. There is no standalone `06-todo.md`; todos are handled via logs and Q&A crystallization.
 
 ## Example
 
